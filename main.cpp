@@ -1,28 +1,113 @@
+#include "algorithms.hpp"
 #include <Magick++.h> 
 #include <iostream> 
-using namespace std; 
-using namespace Magick; 
+
+enum ProgramFunction
+  {
+    UNKNOWN=0,
+    GAUSS,
+    I_niemaminternetuzapomnialemslowo,
+  };
+
+void info()
+{
+  std::cout<<"Odporne metody analizy obrazów"<<std::endl<<"Maciej Szewczyk, Paweł Szymański 2013"<<std::endl;
+  std::cout<<"Użycie: IM opcja plik_wejściowy plik_wyjściowy"<<std::endl;
+  std::cout<<"Opcje:\n\
+\t-g, --gauss\t\t Szum gaussa\n\
+\t-j, --jasność\t\t Jasność obrazu\n\
+\t-q\t\t\t Tryb cichy\n\
+\t - \t\t\t Nie zapisuje efektów na dysk"<<std::endl;
+}
+
 int main(int argc,char **argv) 
 { 
-  InitializeMagick(*argv);
+
+  std::string input="",output="out.png";
+  char whatShallIDo=UNKNOWN;
+  bool silenceMyDear=false, writeToFile=true;
+
+  if(argc<3)
+    {
+      info();
+      return 1;
+    }
+
+  for(int i=1;i<argc;i++)
+    {
+      std::string arg=argv[i];//bez rzutowania if nie dzia, więc niech już będzie ładnie.
+
+      if(argv[i][0]!='-')
+        {
+          if(input=="")
+            input=argv[i];
+          else
+            output=argv[i];
+          continue;
+        }
+
+      else if(arg=="-g" || arg=="--gauss")
+          whatShallIDo=GAUSS;
+
+      else if(arg=="-j" || arg=="--jasność")
+        whatShallIDo=I_niemaminternetuzapomnialemslowo;
+
+      else if(arg=="-q")
+        silenceMyDear=true;
+
+      else if(arg=="-")
+        writeToFile=false;
+    }
+
+  if(whatShallIDo==UNKNOWN || input=="")
+    {
+      info();
+      return 1;
+    }
+
+  Magick::InitializeMagick(*argv);
 
   // Construct the image object. Seperating image construction from the 
   // the read operation ensures that a failure to read the image file 
   // doesn't render the image object useless. 
-  Image image;
+  Magick::Image image;
+
   try { 
-    // Read a file into image object 
-    image.read( "girl.jpg" );
+    image.read( input );
 
-    // Crop the image to specified size (width, height, xOffset, yOffset)
-    image.crop( Geometry(100,100, 100, 100) );
+    switch(whatShallIDo)
+      {
 
+      case GAUSS:
+        {
+          AlgorithmGaussNoise GN;
+          GN(image);
+          break;
+        }
+
+      case I_niemaminternetuzapomnialemslowo:
+        {
+          AlgorithmI I;
+          I(image);
+          break;
+        }
+
+      }
+
+    if(!silenceMyDear)
+      {
+        //IMPORTANT: the image may be altered when it is displayed via 'Image::display()'; in order to prevent such situations always use a copy of the image intended for visualization!
+        Magick::Image copy(image);
+        copy.display();
+      }
+    
     // Write the image to a file 
-    image.write( "x.jpg" ); 
+    if(writeToFile)
+      image.write( output ); 
   } 
-  catch( Exception &error_ ) 
+  catch( Magick::Exception &error_ ) 
     { 
-      cout << "Caught exception: " << error_.what() << endl; 
+      std::cout << "Caught exception: " << error_.what() << std::endl; 
       return 1; 
     } 
   return 0; 
