@@ -17,3 +17,15 @@ void AlgorithmI::OperationPerPixel(Magick::PixelPacket* pixel)
   i/=10;
   pixel->red=pixel->green=pixel->blue=i;
 }
+
+void AlgorithmTest::OperationPerPixel(Magick::PixelPacket* pixel)
+{
+  pixel->red=pixel->green=pixel->blue=1000;
+}
+
+void AlgorithmRead::OperationPerPixel(Magick::PixelPacket* pixel)
+{
+  for(auto channel : {pixel->red, pixel->green, pixel->blue})
+    std::cout<<channel<<" ";
+  std::cout<<std::endl;
+}

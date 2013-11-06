@@ -1,4 +1,9 @@
-#include "simplealgorithm.hpp"
+#include "basealgorithm.hpp"
+
+void BaseAlgorithm::operator ()(Magick::Image& image)
+{
+  DoYourJob(image);
+}
 
 int SimpleAlgorithm::DoYourJob(Magick::Image& image)
 {
@@ -11,9 +16,4 @@ int SimpleAlgorithm::DoYourJob(Magick::Image& image)
       OperationPerPixel(pixelCache.get(x,y,1,1));
   pixelCache.sync();
   return 0;
-}
-
-void SimpleAlgorithm::operator ()(Magick::Image& image)
-{
-  DoYourJob(image);
 }

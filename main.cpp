@@ -1,4 +1,4 @@
-#include "algorithms.hpp"
+#include "algorithmproxy.hpp"
 #include <Magick++.h> 
 #include <iostream> 
 
@@ -7,6 +7,7 @@ enum ProgramFunction
     UNKNOWN=0,
     GAUSS,
     I_niemaminternetuzapomnialemslowo,
+    TEST,
   };
 
 void info()
@@ -16,6 +17,7 @@ void info()
   std::cout<<"Opcje:\n\
 \t-g, --gauss\t\t Szum gaussa\n\
 \t-j, --jasność\t\t Jasność obrazu\n\
+\t-t, --test\t\t algorytm testowy\n\
 \t-q\t\t\t Tryb cichy\n\
 \t - \t\t\t Nie zapisuje efektów na dysk"<<std::endl;
 }
@@ -52,6 +54,9 @@ int main(int argc,char **argv)
       else if(arg=="-j" || arg=="--jasność")
         whatShallIDo=I_niemaminternetuzapomnialemslowo;
 
+      else if(arg=="-t" || arg=="--test")
+        whatShallIDo=TEST;
+
       else if(arg=="-q")
         silenceMyDear=true;
 
@@ -71,6 +76,7 @@ int main(int argc,char **argv)
   // the read operation ensures that a failure to read the image file 
   // doesn't render the image object useless. 
   Magick::Image image;
+  AlgorithmProxy algorithms;
 
   try { 
     image.read( input );
@@ -80,15 +86,20 @@ int main(int argc,char **argv)
 
       case GAUSS:
         {
-          AlgorithmGaussNoise GN;
-          GN(image);
+          algorithms.GaussNoise(image);
           break;
         }
 
       case I_niemaminternetuzapomnialemslowo:
         {
-          AlgorithmI I;
-          I(image);
+          algorithms.I(image);
+          break;
+        }
+
+      case TEST:
+        {
+          algorithms.Test(image);
+          algorithms.Read(image);
           break;
         }
 

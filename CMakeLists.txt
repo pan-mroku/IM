@@ -23,8 +23,8 @@ EXECUTE_PROCESS(
 STRING(STRIP ${MAGICK_LIBS} MAGICK_LIBS)
 SET(LIBS ${MAGICK_LIBS})
 
-SET(HEADERS          algorithms.hpp GaussNoise.h simplealgorithm.hpp)
-SET(SOURCES main.cpp algorithms.cpp GaussNoise.cpp simplealgorithm.cpp)
+SET(HEADERS algorithmproxy.hpp GaussNoise.h   algorithms.hpp basealgorithm.hpp)
+SET(SOURCES main.cpp           GaussNoise.cpp algorithms.cpp basealgorithm.cpp)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 
