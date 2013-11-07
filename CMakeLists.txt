@@ -9,22 +9,24 @@ FIND_PACKAGE(ImageMagick COMPONENTS Magick++)
 INCLUDE_DIRECTORIES(${ImageMagick_INCLUDE_DIRS})
 LINK_DIRECTORIES(${ImageMagick_LIBRARIES})
 
-EXECUTE_PROCESS(
-  COMMAND Magick++-config --cppflags
-  OUTPUT_VARIABLE MAGICK_CPPFLAGS
-  )
-STRING(STRIP ${MAGICK_CPPFLAGS} MAGICK_CPPFLAGS)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MAGICK_CPPFLAGS}")
+IF(CMAKE_HOST_UNIX)
+  EXECUTE_PROCESS(
+    COMMAND Magick++-config --cppflags
+    OUTPUT_VARIABLE MAGICK_CPPFLAGS
+    )
+  STRING(STRIP ${MAGICK_CPPFLAGS} MAGICK_CPPFLAGS)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MAGICK_CPPFLAGS}")
 
-EXECUTE_PROCESS(
-  COMMAND Magick++-config --libs
-  OUTPUT_VARIABLE MAGICK_LIBS
-  )
-STRING(STRIP ${MAGICK_LIBS} MAGICK_LIBS)
-SET(LIBS ${MAGICK_LIBS})
+  EXECUTE_PROCESS(
+    COMMAND Magick++-config --libs
+    OUTPUT_VARIABLE MAGICK_LIBS
+    )
+  STRING(STRIP ${MAGICK_LIBS} MAGICK_LIBS)
+  SET(LIBS ${MAGICK_LIBS})
+ENDIF()
 
-SET(HEADERS algorithmproxy.hpp GaussNoise.h   algorithms.hpp basealgorithm.hpp)
-SET(SOURCES main.cpp           GaussNoise.cpp algorithms.cpp basealgorithm.cpp)
+SET(HEADERS algorithmproxy.hpp GaussNoise.h   algorithms.hpp basealgorithm.hpp mask.hpp)
+SET(SOURCES main.cpp           GaussNoise.cpp algorithms.cpp basealgorithm.cpp mask.cpp)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 

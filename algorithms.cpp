@@ -29,3 +29,16 @@ void AlgorithmRead::OperationPerPixel(Magick::PixelPacket* pixel)
     std::cout<<channel<<" ";
   std::cout<<std::endl;
 }
+
+AlgorithmSingleMaskConvolution::AlgorithmSingleMaskConvolution(Mask& mask):mask(mask){}
+
+int AlgorithmSingleMaskConvolution::DoYourJob(Magick::Image& image)
+{
+  for(int x=0;x<mask.Width;x++)
+    {
+      for(int y=0;y<mask.Height;y++)
+        std::cout<<mask[x][y]<<" ";
+      std::cout<<std::endl;
+    }
+  std::cout<<mask.Weight<<std::endl;
+}

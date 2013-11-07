@@ -1,5 +1,7 @@
 #include "basealgorithm.hpp"
 
+BaseAlgorithm::~BaseAlgorithm(){}
+
 void BaseAlgorithm::operator ()(Magick::Image& image)
 {
   DoYourJob(image);

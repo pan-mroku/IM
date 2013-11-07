@@ -98,8 +98,11 @@ int main(int argc,char **argv)
 
       case TEST:
         {
-          algorithms.Test(image);
-          algorithms.Read(image);
+          /*algorithms.Test(image);
+            algorithms.Read(image);*/
+          Mask m(2,2,1,{1,2,3,4});
+          AlgorithmSingleMaskConvolution alg(m);
+          alg(image);                                             
           break;
         }
 
