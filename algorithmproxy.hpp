@@ -10,6 +10,8 @@ public:
   AlgorithmGaussNoise GaussNoise;
   AlgorithmTest Test;
   AlgorithmRead Read;
+  AlgorithmBlur Blur;
+  AlgorithmHough Hough;
 };
 
 #endif

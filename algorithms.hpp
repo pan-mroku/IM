@@ -17,6 +17,10 @@ public:
 class AlgorithmGaussNoise:public SimpleAlgorithm
 {
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
+
+public:
+  double sigma;
+  AlgorithmGaussNoise(double s=30000);
 };
 
 class AlgorithmTest:public SimpleAlgorithm
@@ -29,13 +33,40 @@ class AlgorithmRead:public SimpleAlgorithm
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
 };
 
-class AlgorithmSingleMaskConvolution:public BaseAlgorithm
+class AlgorithmBlur:public SingleMaskConvolutionAlgorithm
 {
 public:
-  Mask mask;
+  Magick::Image Result;
+  Magick::PixelPacket* ResultPixels;
 
-  AlgorithmSingleMaskConvolution(Mask& mask);  
+  AlgorithmBlur()
+  {
+    ConvolutionMask.Set(3,3,9,{1,1,1,1,1,1,1,1,1});
+  }
+
+  virtual int DoYourJob(Magick::Image& image);
+  virtual void OperationPerPixel(Magick::PixelPacket* pixels, unsigned int x, unsigned int y, Magick::PixelPacket* maskResult);
+};
+
+class HoughAccumulator:public DetailedAlgorithm
+{
+public:
+  Magick::Image Accumulator;
+  Magick::PixelPacket* AccumulatorPixels;
+  virtual int DoYourJob(Magick::Image& image);
+  virtual void OperationPerPixel(Magick::PixelPacket* pixel, unsigned int x, unsigned int y);
+};
+
+class AlgorithmHough:public BaseAlgorithm
+{
+public:
+  AlgorithmI I;
+  HoughAccumulator Accu;
+  AlgorithmBlur Blur;
+
+  AlgorithmHough();
+
   virtual int DoYourJob(Magick::Image& image);
 };
- 
+
 #endif

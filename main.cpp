@@ -6,8 +6,10 @@ enum ProgramFunction
   {
     UNKNOWN=0,
     GAUSS,
-    I_niemaminternetuzapomnialemslowo,
+    ILLUMINANCE,
+    HOUGH,
     TEST,
+    BLUR,
   };
 
 void info()
@@ -15,7 +17,9 @@ void info()
   std::cout<<"Odporne metody analizy obrazów"<<std::endl<<"Maciej Szewczyk, Paweł Szymański 2013"<<std::endl;
   std::cout<<"Użycie: IM opcja plik_wejściowy plik_wyjściowy"<<std::endl;
   std::cout<<"Opcje:\n\
-\t-g, --gauss\t\t Szum gaussa\n\
+\t-b, --blur\t\t Rozmycie\n\
+\t-g, --gauss\t\t Szum Gaussa\n\
+\t-h, --hough\t\t Detektor Hougha\n\
 \t-j, --jasność\t\t Jasność obrazu\n\
 \t-t, --test\t\t algorytm testowy\n\
 \t-q\t\t\t Tryb cichy\n\
@@ -48,11 +52,17 @@ int main(int argc,char **argv)
           continue;
         }
 
+      else if(arg=="-b" || arg=="--blur")
+          whatShallIDo=BLUR;
+
       else if(arg=="-g" || arg=="--gauss")
           whatShallIDo=GAUSS;
 
+      else if(arg=="-h" || arg=="--hough")
+        whatShallIDo=HOUGH;
+
       else if(arg=="-j" || arg=="--jasność")
-        whatShallIDo=I_niemaminternetuzapomnialemslowo;
+        whatShallIDo=ILLUMINANCE;
 
       else if(arg=="-t" || arg=="--test")
         whatShallIDo=TEST;
@@ -79,10 +89,17 @@ int main(int argc,char **argv)
   AlgorithmProxy algorithms;
 
   try { 
+
     image.read( input );
 
     switch(whatShallIDo)
       {
+
+      case BLUR:
+        {
+          algorithms.Blur(image);
+          break;
+        }
 
       case GAUSS:
         {
@@ -90,7 +107,13 @@ int main(int argc,char **argv)
           break;
         }
 
-      case I_niemaminternetuzapomnialemslowo:
+      case HOUGH:
+        {
+          algorithms.Hough(image);
+          break;
+        }
+
+      case ILLUMINANCE:
         {
           algorithms.I(image);
           break;
@@ -100,9 +123,6 @@ int main(int argc,char **argv)
         {
           /*algorithms.Test(image);
             algorithms.Read(image);*/
-          Mask m(2,2,1,{1,2,3,4});
-          AlgorithmSingleMaskConvolution alg(m);
-          alg(image);                                             
           break;
         }
 
