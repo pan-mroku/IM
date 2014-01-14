@@ -22,6 +22,16 @@ void AlgorithmI::OperationPerPixel(Magick::PixelPacket* pixel)
   pixel->red=pixel->green=pixel->blue=i;
 }
 
+void AlgorithmBW::OperationPerPixel(Magick::PixelPacket* pixel)
+{
+  float i=pixel->red+pixel->green+pixel->blue;
+  i/=3;
+  if(i<(1<<QuantumDepth)/2)
+    *pixel=Magick::Color("black");
+  else
+    *pixel=Magick::Color("white");
+}
+
 void AlgorithmTest::OperationPerPixel(Magick::PixelPacket* pixel)
 {
   pixel->red=pixel->green=pixel->blue=1000;
@@ -57,17 +67,17 @@ void AlgorithmBlur::OperationPerPixel(Magick::PixelPacket* pixels, unsigned int 
 int HoughAccumulator::DoYourJob(Magick::Image& image)
 {
   Magick::Geometry size=image.size();
-  int R=floor(sqrt(size.width()*size.width()+size.height()*size.height()));
+  R=floor(sqrt(size.width()*size.width()+size.height()*size.height()));
   Accumulator=Magick::Image(Magick::Geometry(270,R), Magick::ColorRGB(0,0,0));
 
   Magick::Pixels accuCache(Accumulator);
   AccumulatorPixels=accuCache.get(0,0,270,R);
 
-  int result=DetailedAlgorithm::DoYourJob(image);
+  int max=DetailedAlgorithm::DoYourJob(image);
 
   accuCache.sync();
   
-  return result;
+  return max;
 }
 
 void HoughAccumulator::OperationPerPixel(Magick::PixelPacket* pixel, unsigned int x, unsigned int y)
@@ -75,7 +85,7 @@ void HoughAccumulator::OperationPerPixel(Magick::PixelPacket* pixel, unsigned in
   //Zakładam, że obraz jest już czarno-biały i mogę go modyfikować. Jak ktoś chce, to nie sobie sam kopiuje obraz.
   //skoro obraz jest czarno-biały, to wystarczy sprawdzić jeden kanał
 
-  if(pixel->red<65535)
+  if(pixel->red>0)
     return;
 
   for(int fi=-90;fi<180;fi++)
@@ -86,23 +96,70 @@ void HoughAccumulator::OperationPerPixel(Magick::PixelPacket* pixel, unsigned in
       if(r<0)
         continue;
 
-      //      std::cout<<AccumulatorPixels[fi+90+270*(unsigned int)r].red<<std::endl;
       //wystaczy nam jeden kanał
       AccumulatorPixels[fi+90+270*(unsigned int)r].red+=1;
     }
 }
 
-AlgorithmHough::AlgorithmHough():BaseAlgorithm()
+HoughResult HoughAccumulator::Maximum()
 {
-  //Blur(Mask(3,3,9,{1,1,1,1,1,1,1,1,1}));
+  Magick::Pixels accuCache(Accumulator);
+  AccumulatorPixels=accuCache.get(0,0,270,R);
+
+  HoughResult max;
+
+  for(int fi=0;fi<Accumulator.columns();fi++)
+    for(int r=0;r<Accumulator.rows();r++)
+      if(AccumulatorPixels[fi+r*270].red>max.Value)
+        {
+          max.Value=AccumulatorPixels[fi+r*270].red;
+          max.R=r;
+          max.Fi=fi;
+        }
+  accuCache.sync();
+  
+  return max;
 }
 
 int AlgorithmHough::DoYourJob(Magick::Image& image)
 {
-  I(image);
+  BW(image);
+  std::cout<<"BW"<<std::endl;
   Accu(image);
+  std::cout<<"Ac"<<std::endl;
   Blur(Accu.Accumulator);
+  std::cout<<"Bl"<<std::endl;
 
-  image=Accu.Accumulator;
+  HoughResult max=Accu.Maximum();
+  std::cout<<"Max"<<std::endl;
+
+  Magick::Image result(image.size(), Magick::Color("white"));
+  
+  result.modifyImage();
+  Magick::Pixels pixelCache(result);
+  Magick::PixelPacket* pixels=pixelCache.set(0,0,image.columns(),image.rows());
+  for(int x=0;x<image.columns();x++)
+    for(int y=0;y<image.rows();y++)
+      {
+        double fi_f=max.Fi-90;
+        double r_=double(x)*cos(fi_f*3.14/180.0)+double(y)*sin(fi_f*3.14/180.0);
+
+        int pixelIndex=x+y*image.columns();
+
+        if(r_<0) //jak wyżej
+          continue;
+        
+        if(round(r_)==max.R)
+          pixels[pixelIndex].red=pixels[pixelIndex].blue=pixels[pixelIndex].green=0;       
+        else
+          pixels[pixelIndex].red=pixels[pixelIndex].blue=pixels[pixelIndex].green=(1<<QuantumDepth)-1;
+      }
+
+  pixelCache.sync();
+
+  image=result;
+
+  std::cout<<"R: "<<max.R<<" FI: "<<max.Fi<<" Value: "<<max.Value<<std::endl;
+  return 0;
 }
 

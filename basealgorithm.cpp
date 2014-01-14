@@ -81,11 +81,4 @@ int SingleMaskConvolutionAlgorithm::DoYourJob(Magick::Image& image)
     }
   pixelCache.sync();
   return 0;
-  /*for(int x=0;x<mask.Width;x++)
-    {
-      for(int y=0;y<mask.Height;y++)
-        std::cout<<mask[x][y]<<" ";
-      std::cout<<std::endl;
-    }
-    std::cout<<mask.Weight<<std::endl;*/
 }

@@ -7,6 +7,7 @@ class AlgorithmProxy
 {
 public:
   AlgorithmI I;
+  AlgorithmBW BW;
   AlgorithmGaussNoise GaussNoise;
   AlgorithmTest Test;
   AlgorithmRead Read;

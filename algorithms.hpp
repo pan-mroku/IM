@@ -14,6 +14,12 @@ public:
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
 };
 
+class AlgorithmBW:public SimpleAlgorithm
+{
+public:
+  virtual void OperationPerPixel(Magick::PixelPacket* pixel);
+};
+
 class AlgorithmGaussNoise:public SimpleAlgorithm
 {
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
@@ -48,23 +54,39 @@ public:
   virtual void OperationPerPixel(Magick::PixelPacket* pixels, unsigned int x, unsigned int y, Magick::PixelPacket* maskResult);
 };
 
+class HoughResult
+{
+public:
+  HoughResult(int fi=0, int r=0, int value=0):
+    Fi(fi),
+    R(r),
+    Value(value)
+  {}
+  
+  int Fi;
+  int R;
+  int Value;
+};
+
 class HoughAccumulator:public DetailedAlgorithm
 {
 public:
   Magick::Image Accumulator;
   Magick::PixelPacket* AccumulatorPixels;
+  int R;
+
   virtual int DoYourJob(Magick::Image& image);
   virtual void OperationPerPixel(Magick::PixelPacket* pixel, unsigned int x, unsigned int y);
+
+  HoughResult Maximum(); 
 };
 
 class AlgorithmHough:public BaseAlgorithm
 {
 public:
-  AlgorithmI I;
+  AlgorithmBW BW;
   HoughAccumulator Accu;
   AlgorithmBlur Blur;
-
-  AlgorithmHough();
 
   virtual int DoYourJob(Magick::Image& image);
 };

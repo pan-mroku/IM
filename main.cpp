@@ -7,6 +7,7 @@ enum ProgramFunction
     UNKNOWN=0,
     GAUSS,
     ILLUMINANCE,
+    BLACKANDWHITE,
     HOUGH,
     TEST,
     BLUR,
@@ -21,6 +22,7 @@ void info()
 \t-g, --gauss\t\t Szum Gaussa\n\
 \t-h, --hough\t\t Detektor Hougha\n\
 \t-j, --jasność\t\t Jasność obrazu\n\
+\t-m, --monochrome\t\t Czerń i biel\n\
 \t-t, --test\t\t algorytm testowy\n\
 \t-q\t\t\t Tryb cichy\n\
 \t - \t\t\t Nie zapisuje efektów na dysk"<<std::endl;
@@ -63,6 +65,9 @@ int main(int argc,char **argv)
 
       else if(arg=="-j" || arg=="--jasność")
         whatShallIDo=ILLUMINANCE;
+
+      else if(arg=="-m" || arg=="--monochrome")
+        whatShallIDo=BLACKANDWHITE;
 
       else if(arg=="-t" || arg=="--test")
         whatShallIDo=TEST;
@@ -119,10 +124,17 @@ int main(int argc,char **argv)
           break;
         }
 
+      case BLACKANDWHITE:
+        {
+          algorithms.BW(image);
+          break;
+        }
+
       case TEST:
         {
           /*algorithms.Test(image);
             algorithms.Read(image);*/
+          algorithms.Read(image);
           break;
         }
 
