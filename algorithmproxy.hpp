@@ -13,6 +13,7 @@ public:
   AlgorithmRead Read;
   AlgorithmBlur Blur;
   AlgorithmHough Hough;
+  HoughTester HoughTest;
 };
 
 #endif

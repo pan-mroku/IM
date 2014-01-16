@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(IM)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2")
 
 FIND_PACKAGE(ImageMagick COMPONENTS Magick++)
 
@@ -26,7 +26,7 @@ IF(CMAKE_HOST_UNIX)
 ENDIF()
 
 SET(HEADERS algorithmproxy.hpp GaussNoise.h   algorithms.hpp basealgorithm.hpp mask.hpp)
-SET(SOURCES main.cpp           GaussNoise.cpp algorithms.cpp basealgorithm.cpp mask.cpp)
+SET(SOURCES                    GaussNoise.cpp algorithms.cpp basealgorithm.cpp mask.cpp main.cpp)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 

@@ -25,8 +25,12 @@ class AlgorithmGaussNoise:public SimpleAlgorithm
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
 
 public:
-  double sigma;
   AlgorithmGaussNoise(double s=30000);
+
+  double Sigma() const;
+  double Sigma(double s);
+protected:
+  double sigma;
 };
 
 class AlgorithmTest:public SimpleAlgorithm
@@ -89,6 +93,25 @@ public:
   AlgorithmBlur Blur;
 
   virtual int DoYourJob(Magick::Image& image);
+};
+
+class HoughTester:public BaseAlgorithm
+{
+public:
+  int NumberOfNoiseLevels;
+  int NumberOfTriesPerLevel;
+
+  HoughTester(int numberOfNoiseLevels=10, int numberOfTriesPerLevel=10):
+    NumberOfNoiseLevels(numberOfNoiseLevels),
+    NumberOfTriesPerLevel(numberOfTriesPerLevel)
+  {}
+
+  virtual int DoYourJob(Magick::Image& image);
+protected:
+  AlgorithmGaussNoise noise;
+  AlgorithmBW bw;
+  HoughAccumulator accumulator;
+  AlgorithmBlur blur;
 };
 
 #endif

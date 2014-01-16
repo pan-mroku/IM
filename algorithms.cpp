@@ -2,8 +2,24 @@
 #include "GaussNoise.h"
 #include <iostream>
 
-AlgorithmGaussNoise::AlgorithmGaussNoise(double s):SimpleAlgorithm(),sigma(s)
+AlgorithmGaussNoise::AlgorithmGaussNoise(double s):SimpleAlgorithm()
 {
+  Sigma(s);
+}
+
+double AlgorithmGaussNoise::Sigma() const
+{
+  return sigma/1000;
+}
+
+double AlgorithmGaussNoise::Sigma(double s)
+{
+  if(s>100)
+    s=100;
+  if(s<0)
+    s=0;
+
+  sigma=s*1000; //wartości s z zakresu 1-100.   
 }
 
 void AlgorithmGaussNoise::OperationPerPixel(Magick::PixelPacket* pixel)
@@ -72,7 +88,6 @@ int HoughAccumulator::DoYourJob(Magick::Image& image)
 
   Magick::Pixels accuCache(Accumulator);
   AccumulatorPixels=accuCache.get(0,0,270,R);
-
   int max=DetailedAlgorithm::DoYourJob(image);
 
   accuCache.sync();
@@ -163,3 +178,28 @@ int AlgorithmHough::DoYourJob(Magick::Image& image)
   return 0;
 }
 
+int HoughTester::DoYourJob(Magick::Image& image)
+{
+  std::cout<<"\"noise\";\"R\";\"FI\";\"value\""<<std::endl;
+
+  for(int level=0;level<NumberOfNoiseLevels+2;level++)
+    {
+      noise.Sigma(double(level)*100/double(NumberOfNoiseLevels+1));
+
+      for(int pass=0;pass<NumberOfTriesPerLevel;pass++)
+        {
+          Magick::Image copy=image;
+          noise(copy);
+          bw(copy);
+          accumulator(copy);
+          blur(accumulator.Accumulator);
+          
+          HoughResult max=accumulator.Maximum();
+
+          std::cout<<noise.Sigma()<<";"<<max.R<<";"<<max.Fi<<";"<<max.Value<<std::endl;
+
+          if(level==0)
+            break;
+        }
+    }
+}
