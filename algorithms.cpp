@@ -19,7 +19,7 @@ double AlgorithmGaussNoise::Sigma(double s)
   if(s<0)
     s=0;
 
-  sigma=s*1000; //wartości s z zakresu 1-100.   
+  sigma=s/100.0*(1<<QuantumDepth+1); //wartości s z zakresu 1-100.   
 }
 
 void AlgorithmGaussNoise::OperationPerPixel(Magick::PixelPacket* pixel)
