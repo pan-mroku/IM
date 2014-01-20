@@ -7,6 +7,7 @@ enum ProgramFunction
   {
     UNKNOWN=0,
     ANALYSE,
+    SHIFT,
     GAUSS,
     ILLUMINANCE,
     BLACKANDWHITE,
@@ -20,15 +21,16 @@ void info()
   std::cout<<"Odporne metody analizy obrazów"<<std::endl<<"Maciej Szewczyk, Paweł Szymański 2013"<<std::endl;
   std::cout<<"Użycie: IM opcja plik_wejściowy plik_wyjściowy"<<std::endl;
   std::cout<<"Opcje:\n\
-\t-a, --analiza [ilość poziomów=10] [ilość prób na poziom=10]\t Analiza odporności algorytmu Hougha\n\
-\t-b, --blur\t\t\t\t\t\t\t Rozmycie\n\
-\t-g, --gauss [s:0-100 = 30]\t\t\t\t\t Szum Gaussa\n\
-\t-h, --hough\t\t\t\t\t\t\t Detektor Hougha\n\
-\t-j, --jasność\t\t\t\t\t\t\t Jasność obrazu\n\
-\t-m, --monochrome\t\t\t\t\t\t Czerń i biel\n\
-\t-t, --test\t\t\t\t\t\t\t algorytm testowy\n\
-\t-q\t\t\t\t\t\t\t\t Tryb cichy\n\
-\t - \t\t\t\t\t\t\t\t Nie zapisuje efektów na dysk"<<std::endl;
+\t-a, --analiza [ilość poziomów szumu] [ilość prób na poziom szumu]\t Analiza odporności algorytmu Hougha\n\
+\t-b, --blur\t\t\t\t\t\t\t\t Rozmycie\n\
+\t-g, --gauss [s:0-100]\t\t\t\t\t\t\t Szum Gaussa\n\
+\t-h, --hough\t\t\t\t\t\t\t\t Detektor Hougha\n\
+\t-j, --jasność\t\t\t\t\t\t\t\t Jasność obrazu\n\
+\t-m, --monochrome\t\t\t\t\t\t\t Czerń i biel\n\
+\t-s, --shift [s:0-100]\t\t\t\t\t\t\t Szum przesunięć\n\
+\t-t, --test\t\t\t\t\t\t\t\t algorytm testowy\n\
+\t-q\t\t\t\t\t\t\t\t\t Tryb cichy\n\
+\t - \t\t\t\t\t\t\t\t\t Nie zapisuje efektów na dysk"<<std::endl;
 }
 
 int main(int argc,char **argv) 
@@ -72,6 +74,15 @@ int main(int argc,char **argv)
 
       else if(arg=="-b" || arg=="--blur")
           whatShallIDo=BLUR;
+
+      else if(arg=="-s" || arg=="--shift")
+        {
+          if(argv[i+1][0]>='0' && argv[i+1][0]<='9')
+            algorithms.ShiftNoise.Percent=std::stod(argv[++i]);
+
+          whatShallIDo=SHIFT;
+          
+        }
 
       else if(arg=="-g" || arg=="--gauss")
         {
@@ -131,6 +142,12 @@ int main(int argc,char **argv)
       case BLUR:
         {
           algorithms.Blur(image);
+          break;
+        }
+
+      case SHIFT:
+        {
+          algorithms.ShiftNoise(image);
           break;
         }
 

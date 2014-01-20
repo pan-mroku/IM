@@ -20,6 +20,18 @@ public:
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
 };
 
+class AlgorithmShiftNoise:public BaseAlgorithm
+{
+public:
+  int Percent;
+
+  AlgorithmShiftNoise(int percent=10):
+    Percent(percent)
+  {}
+
+  virtual int DoYourJob(Magick::Image& image);
+};
+
 class AlgorithmGaussNoise:public SimpleAlgorithm
 {
   virtual void OperationPerPixel(Magick::PixelPacket* pixel);
@@ -108,7 +120,7 @@ public:
 
   virtual int DoYourJob(Magick::Image& image);
 protected:
-  AlgorithmGaussNoise noise;
+  AlgorithmShiftNoise noise;
   AlgorithmBW bw;
   HoughAccumulator accumulator;
   AlgorithmBlur blur;

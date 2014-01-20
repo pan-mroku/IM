@@ -8,6 +8,7 @@ class AlgorithmProxy
 public:
   AlgorithmI I;
   AlgorithmBW BW;
+  AlgorithmShiftNoise ShiftNoise;
   AlgorithmGaussNoise GaussNoise;
   AlgorithmTest Test;
   AlgorithmRead Read;

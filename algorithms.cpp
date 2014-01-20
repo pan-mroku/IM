@@ -1,6 +1,8 @@
 #include "algorithms.hpp"
 #include "GaussNoise.h"
 #include <iostream>
+#include <cstdlib> //rand
+#include <ctime> //time
 
 AlgorithmGaussNoise::AlgorithmGaussNoise(double s):SimpleAlgorithm()
 {
@@ -20,6 +22,35 @@ double AlgorithmGaussNoise::Sigma(double s)
     s=0;
 
   sigma=s/100.0*(1<<QuantumDepth+1); //wartości s z zakresu 1-100.   
+}
+
+int AlgorithmShiftNoise::DoYourJob(Magick::Image& image)
+{
+  srand(time(NULL));
+
+  image.modifyImage();
+  Magick::Pixels pixelCache(image);
+
+  Magick::PixelPacket* pixels=pixelCache.get(0,0,image.columns(), image.rows());
+
+  for (int fromX=0; fromX<image.columns(); fromX++)
+    for(int fromY=0; fromY<image.rows(); fromY++)
+      {
+        int luck=rand()%100;
+        if (luck>Percent)
+          continue;
+
+      int toX=rand()%image.columns();
+      int toY=rand()%image.rows();
+
+      Magick::PixelPacket tmp=pixels[fromX+fromY*image.columns()];
+      pixels[fromX+fromY*image.columns()]=pixels[toX+toY*image.columns()];
+      pixels[toX+toY*image.columns()]=tmp;
+    }
+
+  pixelCache.sync();
+
+  return 0;
 }
 
 void AlgorithmGaussNoise::OperationPerPixel(Magick::PixelPacket* pixel)
@@ -184,7 +215,7 @@ int HoughTester::DoYourJob(Magick::Image& image)
 
   for(int level=0;level<NumberOfNoiseLevels+2;level++)
     {
-      noise.Sigma(double(level)*100/double(NumberOfNoiseLevels+1));
+      noise.Percent=level*100/(NumberOfNoiseLevels+1);
 
       for(int pass=0;pass<NumberOfTriesPerLevel;pass++)
         {
@@ -196,7 +227,7 @@ int HoughTester::DoYourJob(Magick::Image& image)
           
           HoughResult max=accumulator.Maximum();
 
-          std::cout<<noise.Sigma()<<";"<<max.R<<";"<<max.Fi<<";"<<max.Value<<std::endl;
+          std::cout<<noise.Percent<<";"<<max.R<<";"<<max.Fi<<";"<<max.Value<<std::endl;
 
           if(level==0)
             break;
